@@ -7,20 +7,15 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "angular": "^1.4.7",
-    "angular-animate": "^1.4.7",
-    "angular-aria": "^1.4.7",
-    "angular-material": "git+https://github.com/angular/material",
-    "angular-route": "^1.4.7",
-    "babel": "^5.8.23",
-    "bluebird": "^2.10.2",
+    "angular": "^1.4.8",
+    "angular-animate": "^1.4.8",
+    "angular-aria": "^1.4.8",
+    "angular-route": "^1.4.8",
     "eventemitter3": "^1.1.1",
     "lodash": "^3.10.1",
-    "prompt": "^0.2.14",
-    "react": "^0.14.1",
-    "request": "^2.65.0",
+    "request": "^2.67.0",
     "socket.io-client": "git+https://github.com/socketio/socket.io-client.git",
     "socket.io-stream": "git+https://github.com/nkzawa/socket.io-stream.git",
-    "ws": "^0.8.0"
+    "ws": "^1.0.1"
   }
 }
