@@ -3,6 +3,7 @@
 var EE = require('eventemitter3');
 var remote = require('remote');
 var app = remote.require('app');
+var dialog = remote.dialog;
 
 class Socket extends EE {
   constructor() {
@@ -167,6 +168,7 @@ htubeApp.controller('ListUsersController', ['$scope', 'socket', '$mdDialog', fun
   $scope.clickPerson = function clickPerson(user, $event) {
     console.log(user);
     console.log($event);
+    console.log(dialog.showOpenDialog({ properties: [ 'openFile' ]}));
   };
 
   socket.on('user_connected', () => {
