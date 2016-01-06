@@ -116,8 +116,7 @@ htubeApp.controller('LoginController', ['$scope', '$location', 'socket', ($scope
 
     loginView.addEventListener("dom-ready", function () {
       // fix font
-      loginView.insertCSS('body { overflow:hidden; background-color: white ! important; }' +
-        ' .inputbox { font-family: "Lucida Grande","Helvetica","Arial","Verdana",sans-serif ! important }');
+      loginView.insertCSS('body { overflow:hidden; background-color: white ! important; }');
     });
 
     loginView.addEventListener("did-get-redirect-request", function (ev) {
