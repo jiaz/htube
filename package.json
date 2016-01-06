@@ -1,0 +1,26 @@
+{
+  "name": "htube",
+  "version": "1.0.0",
+  "description": "",
+  "main": "main.js",
+  "scripts": {},
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "angular": "^1.4.7",
+    "angular-animate": "^1.4.7",
+    "angular-aria": "^1.4.7",
+    "angular-material": "git+https://github.com/angular/material",
+    "angular-route": "^1.4.7",
+    "babel": "^5.8.23",
+    "bluebird": "^2.10.2",
+    "eventemitter3": "^1.1.1",
+    "lodash": "^3.10.1",
+    "prompt": "^0.2.14",
+    "react": "^0.14.1",
+    "request": "^2.65.0",
+    "socket.io-client": "git+https://github.com/socketio/socket.io-client.git",
+    "socket.io-stream": "git+https://github.com/nkzawa/socket.io-stream.git",
+    "ws": "^0.8.0"
+  }
+}

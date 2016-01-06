@@ -1,0 +1,4 @@
+node_modules_fixed/
+node_modules/
+*.iml
+.idea/

@@ -1,0 +1,20 @@
+<div id="list-wrapper" layout="column">
+
+  <div id="info-panel" layout="row" layout-align="start center">
+    <img class="img-circle large-img" ng-src="{{userProfile.avatar}}"/>
+
+    <h3 class="md-headline">{{userProfile.firstName}} {{userProfile.lastName}}</h3>
+  </div>
+
+  <div id="list-panel" layout="column" flex>
+    <md-list>
+      <md-subheader>connected users</md-subheader>
+      <md-list-item ng-repeat="user in users" class="nohand" ng-click="clickPerson(user, $event)">
+        <img class="md-avatar" ng-src="{{user.avatar}}"/>
+
+        <p>{{user.firstName}} {{user.lastName}}</p>
+      </md-list-item>
+    </md-list>
+  </div>
+
+</div>
