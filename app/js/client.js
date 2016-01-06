@@ -153,7 +153,6 @@ htubeApp.controller('ListUsersController', ['$scope', 'socket', '$mdDialog', fun
   $scope.userProfile = socket.session.userProfile;
 
   $scope.refreshUser = function refreshUser() {
-    console.log('ase')
     socket.listUsers((err, users) => {
       console.log('list of users: ' + JSON.stringify(users));
       $scope.onUserUpdated(users);
