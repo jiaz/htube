@@ -31,7 +31,7 @@ class Socket extends EE {
   }
 
   connect() {
-    this.client = io('http://localhost.hulu.com:3000', {
+    this.client = io('http://10.30.16.85.ip.hulu.com:3000', {
       perMessageDeflate: false,
       transports: ['websocket']
     });
@@ -145,11 +145,11 @@ htubeApp.controller('ListUsersController', ['$scope', 'socket', '$mdDialog', fun
 
   // list users
   socket.listUsers((err, users) => {
-    var userString = JSON.stringify(users[0]);
-    users = [];
-    for (let i = 0; i < 15; ++i) {
-      users.push(JSON.parse(userString));
-    }
+    // var userString = JSON.stringify(users[0]);
+    // users = [];
+    // for (let i = 0; i < 15; ++i) {
+    //   users.push(JSON.parse(userString));
+    // }
     console.log('list of users: ' + JSON.stringify(users));
     $scope.onUserUpdated(users);
   });
