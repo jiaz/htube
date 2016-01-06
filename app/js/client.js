@@ -31,16 +31,18 @@ class Socket extends EE {
   }
 
   connect() {
-    this.client = io('http://10.30.16.85.ip.hulu.com:3000', {
+    this.client = io('http://localhost.hulu.com:3000', {
       perMessageDeflate: false,
       transports: ['websocket']
     });
 
     this.client.on('connect', this.onConnect.bind(this));
-    this.client.on('auth_required', this.onAuth.bind(this));
-    this.client.on('hello', this.onServerHello.bind(this));
-    this.client.on('ready', this.onReady.bind(this));
     this.client.on('connect_error', this.onConnectError.bind(this));
+    this.client.on('ev_auth_required', this.onAuth.bind(this));
+    this.client.on('ev_hello', this.onServerHello.bind(this));
+    this.client.on('ev_ready', this.onReady.bind(this));
+    this.client.on('ev_user_connected', this.onUserConnected.bind(this));
+    this.client.on('ev_user_disconnected', this.onUserDisconnected.bind(this));
   }
 
   disconnect() {
@@ -53,9 +55,7 @@ class Socket extends EE {
   }
 
   listUsers(cb) {
-    this.request('ls', (err, resp) => {
-      console.log(err);
-      console.log(resp);
+    this.request('cmd_ls', (err, resp) => {
       cb(err, resp);
     });
   }
@@ -79,6 +79,16 @@ class Socket extends EE {
     this.client.close();
     console.log('failed to connect to server' + err);
     this.emit('error', err);
+  }
+
+  onUserConnected() {
+    console.log('user connected');
+    this.emit('user_connected');
+  }
+  
+  onUserDisconnected() {
+    console.log('user disconnected');
+    this.emit('user_disconnected');
   }
 
   onReady(data) {
@@ -141,18 +151,13 @@ htubeApp.controller('LoginController', ['$scope', '$location', 'socket', ($scope
 htubeApp.controller('ListUsersController', ['$scope', 'socket', '$mdDialog', function ($scope, socket, $mdDialog) {
   $scope.userProfile = socket.session.userProfile;
 
-  console.log(socket.session.userProfile);
-
-  // list users
-  socket.listUsers((err, users) => {
-    // var userString = JSON.stringify(users[0]);
-    // users = [];
-    // for (let i = 0; i < 15; ++i) {
-    //   users.push(JSON.parse(userString));
-    // }
-    console.log('list of users: ' + JSON.stringify(users));
-    $scope.onUserUpdated(users);
-  });
+  $scope.refreshUser = function refreshUser() {
+    console.log('ase')
+    socket.listUsers((err, users) => {
+      console.log('list of users: ' + JSON.stringify(users));
+      $scope.onUserUpdated(users);
+    });
+  };
 
   $scope.onUserUpdated = function onUserUpdated(users) {
     $scope.users = users;
@@ -164,6 +169,15 @@ htubeApp.controller('ListUsersController', ['$scope', 'socket', '$mdDialog', fun
     console.log($event);
   };
 
+  socket.on('user_connected', () => {
+    $scope.refreshUser();
+  });
+
+  socket.on('user_disconnected', () => {
+    $scope.refreshUser();
+  })
+
+  $scope.refreshUser();
 }]);
 
 htubeApp.factory('socket', function () {
