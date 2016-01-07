@@ -6,6 +6,17 @@
     <h3 class="md-headline name-title">{{userProfile.firstName}} {{userProfile.lastName}}</h3>
   </md-toolbar>
 
+    <md-list>
+        <div ng-repeat="send in sendQueue" ng-click="closeSend(send, $event)">
+            Sending {{send.name}} {{send.currentSize / 1024 | number: 0}} out of {{send.size / 1024 | number: 0}} kb to {{send.user.firstName}}
+            <md-progress-linear md-mode="determinate" value="{{send.percentage}}"></md-progress-linear>
+        </div>
+        <div ng-repeat="receive in receiveQueue" ng-click="closeReceive(receive, $event)">
+            Receiving {{receive.name}} {{receive.currentSize / 1024 | number: 0}} out of {{receive.size / 1024 | number: 0}} kb from {{receive.user.firstName}}
+            <md-progress-linear md-mode="determinate" value="{{receive.percentage}}"></md-progress-linear>
+        </div>
+    </md-list>
+
   <md-content flex>
     <div id="list-panel" layout="column" class="nano-content" flex>
       <md-list>

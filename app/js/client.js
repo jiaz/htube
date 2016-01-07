@@ -50,6 +50,9 @@ class Socket extends EE {
     this.client.on('ev_user_disconnected', this.onUserDisconnected.bind(this));
     this.client.on('ev_receive_file', this.onReceiveRequest.bind(this));
     this.client.on('ev_send_file', this.onAcceptRequest.bind(this));
+    this.client.on('ev_progress_start', this.onProgressStart.bind(this));
+    this.client.on('ev_progress_update', this.onProgressUpdate.bind(this));
+    this.client.on('ev_progress_end', this.onProgressEnd.bind(this));
   }
 
   disconnect() {
@@ -90,7 +93,7 @@ class Socket extends EE {
 
   onReceiveFileStream(readStream, params) {
     console.log('ev_ss_receive_file: ' + JSON.stringify(params));
-    readStream.pipe(fs.createWriteStream(receiveMap.get(params.guid)));
+    readStream.pipe(fs.createWriteStream(receiveMap.get(params.guid).file));
     readStream.on('end', () => {
         this.emit('complete_receive_file', params.guid);
     });
@@ -145,11 +148,25 @@ class Socket extends EE {
   onAcceptRequest(data) {
       this.emit('start_send_file', data);
   }
+
+  onProgressStart(data) {
+      this.emit('start_progress', data);
+  }
+
+  onProgressUpdate(data) {
+      this.emit('update_progress', data);
+  }
+
+  onProgressEnd(data) {
+      this.emit('end_progress', data);
+  }
 }
 
 var htubeApp = angular.module('htubeApp', ['ngMaterial', 'ngRoute']);
 var requestMap = new Map();
 var receiveMap = new Map();
+var sendQueue = [];
+var receiveQueue = [];
 
 function getGuid() {
     function s4() {
@@ -232,9 +249,30 @@ htubeApp.controller('ListUsersController', ['$scope', 'socket', '$mdDialog', fun
           let size = fs.statSync(file).size;
           let requestGuid = getGuid();
           socket.sendRequest(user.userGuid, name, size, requestGuid);
-          requestMap.set(requestGuid, [user.userGuid, file]);
+          let t = {
+                  name: name,
+                  file: file,
+                  size: size,
+                  user: user,
+          }
+          console.log(JSON.stringify(t));
+          requestMap.set(requestGuid, t);
       }
     });
+  };
+
+  $scope.closeSend = function closeSend(send) {
+      if (send.percentage == 100){
+          sendQueue.splice(sendQueue.indexOf(send), 1);
+          requestMap.delete(send.guid);
+      }
+  };
+
+  $scope.closeReceive = function closeReceive(receive) {
+      if (receive.percentage == 100){
+          receiveQueue.splice(receiveQueue.indexOf(receive), 1);
+          receiveMap.delete(receive.guid);
+      }
   };
 
   function findUser(userGuid) {
@@ -262,24 +300,70 @@ htubeApp.controller('ListUsersController', ['$scope', 'socket', '$mdDialog', fun
           let directories = dialog.showOpenDialog({properties: ['openDirectory']});
           if (directories) {
               socket.acceptRequest(data.sender, data.guid);
-              receiveMap.set(data.guid, path.join(directories[0], data.file));
+              let t = {
+                      name: data.file,
+                      file: path.join(directories[0], data.file),
+                      size: data.fileSize,
+                      user: sender,
+              }
+              receiveMap.set(data.guid, t);
           }
       }
   });
 
   socket.on('start_send_file', (data) => {
-      console.log('start sending file: ' + requestMap.get(data.guid)[1]);
-      socket.sendFileStream(data, requestMap.get(data.guid)[1]);
+      console.log('start sending file: ' + requestMap.get(data.guid).file);
+      socket.sendFileStream(data, requestMap.get(data.guid).file);
+  });
+
+  socket.on('start_progress', (data) => {
+      console.log('start progress: ' + JSON.stringify(data));
+      var t;
+      if (data.isSender) {
+          t = requestMap.get(data.guid);
+          sendQueue.push(t);
+          $scope.sendQueue = sendQueue;
+      }else{
+          t = receiveMap.get(data.guid);
+          receiveQueue.push(t);
+          $scope.receiveQueue = receiveQueue;
+      }
+      t.guid = data.guid;
+      t.percentage = 0;
+      t.currentSize = 0;
+      t.transferRate = 0;
+      $scope.$apply();
+  });
+
+  socket.on('update_progress', (data) => {
+      console.log('update progress: ' + JSON.stringify(data));
+      var t;
+      if (data.isSender) {
+          t = requestMap.get(data.guid);
+      }else{
+          t = receiveMap.get(data.guid);
+      }
+      t.percentage = data.percentage;
+      t.currentSize = data.current_size;
+      t.transferRate = data.transfer_rate;
+      $scope.$apply();
+  });
+
+  socket.on('end_progress', (data) => {
+      console.log('end progress: ' + JSON.stringify(data));
+      
   });
 
   socket.on('complete_send_file', (guid) => {
-      requestMap.delete(guid);
-      console.log(guid + ' send done! requestMap: ' + JSON.stringify(requestMap));
+      //requestMap.delete(guid);
+      console.log(guid + ' send done! requestMap: ');
+      console.log(requestMap);
   });
 
   socket.on('complete_receive_file', (guid) => {
-      receiveMap.delete(guid);
-      console.log(guid + ' receive done! receiveMap: ' + JSON.stringify(receiveMap));
+      //receiveMap.delete(guid);
+      console.log(guid + ' receive done! receiveMap: ');
+      console.log(receiveMap);
   });
 
   $scope.refreshUser();
