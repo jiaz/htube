@@ -214,27 +214,8 @@ htubeApp.controller('ListUsersController', ['$scope', 'socket', '$mdDialog', fun
 
   $scope.refreshUser = function refreshUser() {
     socket.listUsers((err, users) => {
-      var newUsers = [];
-      for (var u of users) {
-        newUsers.push(JSON.parse(JSON.stringify(u)));
-        newUsers.push(JSON.parse(JSON.stringify(u)));
-        newUsers.push(JSON.parse(JSON.stringify(u)));
-        newUsers.push(JSON.parse(JSON.stringify(u)));
-        newUsers.push(JSON.parse(JSON.stringify(u)));
-        newUsers.push(JSON.parse(JSON.stringify(u)));
-        newUsers.push(JSON.parse(JSON.stringify(u)));
-        newUsers.push(JSON.parse(JSON.stringify(u)));
-        newUsers.push(JSON.parse(JSON.stringify(u)));
-        newUsers.push(JSON.parse(JSON.stringify(u)));
-        newUsers.push(JSON.parse(JSON.stringify(u)));
-        newUsers.push(JSON.parse(JSON.stringify(u)));
-        newUsers.push(JSON.parse(JSON.stringify(u)));
-        newUsers.push(JSON.parse(JSON.stringify(u)));
-        newUsers.push(JSON.parse(JSON.stringify(u)));
-        newUsers.push(JSON.parse(JSON.stringify(u)));
-      }
       console.log('list of users: ' + JSON.stringify(users));
-      $scope.onUserUpdated(newUsers);
+      $scope.onUserUpdated(users);
     });
   };
 
