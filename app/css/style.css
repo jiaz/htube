@@ -50,7 +50,3 @@ body {
   color: white;
   cursor: default;
 }
-
-#list-panel {
-  overflow-y: scroll;
-}

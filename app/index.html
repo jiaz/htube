@@ -5,6 +5,7 @@
   <title>HTube</title>
   <link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/angular_material/1.0.0/angular-material.min.css">
   <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/nano.css">
 </head>
 <body>
 <script type='text/javascript' src='../node_modules/angular/angular.js'></script>
@@ -15,6 +16,8 @@
 <script src="http://ajax.googleapis.com/ajax/libs/angular_material/1.0.0/angular-material.min.js"></script>
 <script type='text/javascript' src='../node_modules/socket.io-client/socket.io.js'></script>
 <script>
+  require('jquery');
+  require('./js/vendors/jquery.nanoscroller.min.js');
   require('./js/client');
 </script>
 <div id="outer-wrapper" ng-view></div>
