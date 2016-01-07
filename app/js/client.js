@@ -2,7 +2,6 @@
 
 var EE = require('eventemitter3');
 var remote = require('remote');
-var fs = require('fs');
 var app = remote.require('app');
 var socketStream = require('socket.io-stream');
 const dialog = remote.dialog;
@@ -51,7 +50,6 @@ class Socket extends EE {
     this.client.on('ev_user_disconnected', this.onUserDisconnected.bind(this));
     this.client.on('ev_receive_file', this.onReceiveRequest.bind(this));
     this.client.on('ev_send_file', this.onAcceptRequest.bind(this));
-    this.client.on('ev_ss_receive_file', this.onReceiveFileStream.bind(this));
   }
 
   disconnect() {
@@ -81,22 +79,18 @@ class Socket extends EE {
       });
   }
 
-  sendFileStream(params) {
+  sendFileStream(params, file) {
     let writeStream = socketStream.createStream();
     this.socketStream.emit('ev_ss_send_file', writeStream, params);
-    fs.createReadStream('package.json').pipe(writeStream);
+    fs.createReadStream(file).pipe(writeStream);
     writeStream.on('end', () => {
       console.log('send done!');
     });
   }
 
-  onSendFile(data) {
-    this.sendFileStream(data);
-  }
-
   onReceiveFileStream(readStream, params) {
     console.log('ev_ss_receive_file: ' + JSON.stringify(params));
-    readStream.pipe(fs.createWriteStream('test.data'));
+    readStream.pipe(fs.createWriteStream(receiveMap.get(params.guid)));
     readStream.on('end', () => {
       console.log('receive done!');
     });
@@ -106,7 +100,7 @@ class Socket extends EE {
     console.log('connected to server! waiting for server message.');
 
     this.socketStream = socketStream(this.client);
-    this.socketStream.on('ev_ss_receive_data', this.onReceiveFile.bind(this));
+    this.socketStream.on('ev_ss_receive_file', this.onReceiveFileStream.bind(this));
 
     this.emit('connected');
   }
@@ -259,7 +253,7 @@ htubeApp.controller('ListUsersController', ['$scope', 'socket', '$mdDialog', fun
 
   socket.on('receive_request', (data) => {
       console.log('receive_request: ' + JSON.stringify(data)); 
-      sender = findUser(data.user);
+      var sender = findUser(data.user);
       var choice = dialog.showMessageBox({type: 'question', buttons: ['No', 'Yes'],
           title: 'Incoming File', message: sender.firstName + ' ' + sender.lastName + ' wants to send you ' + data.file +
           ' (' + (data.fileSize / 1024 >> 0) + 'kb). Accept?'});
@@ -275,6 +269,7 @@ htubeApp.controller('ListUsersController', ['$scope', 'socket', '$mdDialog', fun
 
   socket.on('start_send_file', (data) => {
       console.log('start sending file: ' + requestMap.get(data.guid)[1]);
+      socket.sendFileStream(data, requestMap.get(data.guid)[1]);
   });
 
   $scope.refreshUser();
