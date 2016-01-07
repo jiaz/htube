@@ -39,7 +39,16 @@ body {
 }
 
 #info-panel {
-  background-color: #b1dcfb;
+  padding-top: 20px;
+  padding-bottom: 5px;
+  background-color: #5BA02D;
+  -webkit-user-select: none;
+  -webkit-app-region: drag;
+}
+
+#info-panel .name-title {
+  color: white;
+  cursor: default;
 }
 
 #list-panel {

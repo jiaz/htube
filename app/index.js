@@ -19,7 +19,8 @@ app.on('ready', () => {
   mainWindow = new BrowserWindow({
     width: 440,
     height: 700,
-    resizable: false
+    resizable: false,
+    'title-bar-style': 'hidden'
   });
 
   mainWindow.webContents.openDevTools({detach: true});

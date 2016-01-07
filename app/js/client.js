@@ -225,15 +225,16 @@ htubeApp.controller('ListUsersController', ['$scope', 'socket', '$mdDialog', fun
   };
 
   $scope.clickPerson = function clickPerson(user) {
-    var files = dialog.showOpenDialog({properties: ['openFile']});
-    if (files) {
-        let file = files[0];
-        let name = path.basename(file);
-        let size = fs.statSync(file).size;
-        let requestGuid = getGuid();
-        socket.sendRequest(user.userGuid, name, size, requestGuid);
-        requestMap.set(requestGuid, [user.userGuid, file]);
-    }
+    dialog.showOpenDialog({properties: ['openFile']}, (files) => {
+      if (files) {
+          let file = files[0];
+          let name = path.basename(file);
+          let size = fs.statSync(file).size;
+          let requestGuid = getGuid();
+          socket.sendRequest(user.userGuid, name, size, requestGuid);
+          requestMap.set(requestGuid, [user.userGuid, file]);
+      }
+    });
   };
 
   function findUser(userGuid) {
