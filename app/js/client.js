@@ -3,7 +3,9 @@
 var EE = require('eventemitter3');
 var remote = require('remote');
 var app = remote.require('app');
-var dialog = remote.dialog;
+const dialog = remote.dialog;
+const fs = require('fs');
+const path = require('path');
 
 class Socket extends EE {
   constructor() {
@@ -44,6 +46,8 @@ class Socket extends EE {
     this.client.on('ev_ready', this.onReady.bind(this));
     this.client.on('ev_user_connected', this.onUserConnected.bind(this));
     this.client.on('ev_user_disconnected', this.onUserDisconnected.bind(this));
+    this.client.on('ev_receive_file', this.onReceiveRequest.bind(this));
+    this.client.on('ev_send_file', this.onAcceptRequest.bind(this));
   }
 
   disconnect() {
@@ -59,6 +63,18 @@ class Socket extends EE {
     this.request('cmd_ls', (err, resp) => {
       cb(err, resp);
     });
+  }
+
+  sendRequest(userGuid, name, size, requestGuid) {
+      this.request('cmd_send_file', [userGuid, name, size, requestGuid], (err, resp) => {
+          console.log(resp + ' ' + userGuid + ' ' + name + ': ' + size + ' ' + requestGuid);
+      });
+  }
+
+  acceptRequest(userGuid, requestGuid) {
+      this.request('cmd_receive_file', [userGuid, requestGuid], (err, resp) => {
+          console.log(resp + ' ' + userGuid + ' ' + requestGuid);
+      });
   }
 
   onConnect() {
@@ -98,9 +114,30 @@ class Socket extends EE {
     cb(data.error, data.response);
     this.seqMap.delete(data.seqId);
   }
+
+  onReceiveRequest(data) {
+      this.emit('receive_request', data);
+  }
+
+  onAcceptRequest(data) {
+      this.emit('start_send_file', data);
+  }
 }
 
 var htubeApp = angular.module('htubeApp', ['ngMaterial', 'ngRoute']);
+var requestMap = new Map();
+var receiveMap = new Map();
+
+function getGuid() {
+    function s4() {
+      return Math.floor((1 + Math.random()) * 0x10000)
+        .toString(16)
+        .substring(1);
+    }
+
+    return s4() + s4() + '-' + s4() + '-' + s4() + '-' +
+      s4() + '-' + s4() + s4() + s4();
+}
 
 htubeApp.config(['$routeProvider', '$mdThemingProvider', function ($routeProvider, $mdThemingProvider) {
     $routeProvider
@@ -164,19 +201,52 @@ htubeApp.controller('ListUsersController', ['$scope', 'socket', '$mdDialog', fun
     $scope.$apply();
   };
 
-  $scope.clickPerson = function clickPerson(user, $event) {
-    console.log(user);
-    console.log($event);
-    console.log(dialog.showOpenDialog({ properties: [ 'openFile' ]}));
+  $scope.clickPerson = function clickPerson(user) {
+    var files = dialog.showOpenDialog({properties: ['openFile']});
+    if (files) {
+        let file = files[0];
+        let name = path.basename(file);
+        let size = fs.statSync(file).size;
+        let requestGuid = getGuid();
+        socket.sendRequest(user.userGuid, name, size, requestGuid);
+        requestMap.set(requestGuid, [user.userGuid, file]);
+    }
   };
 
+  function findUser(userGuid) {
+      var user = $scope.users.filter(function (user) { return user.userGuid == userGuid });
+      if (user.length > 0) {
+          return user[0];
+      }
+  }
+  
   socket.on('user_connected', () => {
     $scope.refreshUser();
   });
 
   socket.on('user_disconnected', () => {
     $scope.refreshUser();
-  })
+  });
+
+  socket.on('receive_request', (data) => {
+      console.log('receive_request: ' + JSON.stringify(data)); 
+      sender = findUser(data.user);
+      var choice = dialog.showMessageBox({type: 'question', buttons: ['No', 'Yes'],
+          title: 'Incoming File', message: sender.firstName + ' ' + sender.lastName + ' wants to send you ' + data.file +
+          ' (' + (data.fileSize / 1024 >> 0) + 'kb). Accept?'});
+      if (choice) {
+          let directories = dialog.showOpenDialog({properties: ['openDirectory']});
+          if (directories) {
+              socket.acceptRequest(data.user, data.guid);
+              receiveMap.set(data.guid, path.join(directories[0], data.file));
+              console.log(receiveMap);
+          }
+      }
+  });
+
+  socket.on('start_send_file', (data) => {
+      console.log('start sending file: ' + requestMap.get(data.guid)[1]);
+  });
 
   $scope.refreshUser();
 }]);
