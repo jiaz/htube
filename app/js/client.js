@@ -2,7 +2,9 @@
 
 var EE = require('eventemitter3');
 var remote = require('remote');
+var fs = require('fs');
 var app = remote.require('app');
+var socketStream = require('socket.io-stream');
 const dialog = remote.dialog;
 const fs = require('fs');
 const path = require('path');
@@ -34,10 +36,11 @@ class Socket extends EE {
   }
 
   connect() {
-    this.client = io('http://10.30.16.85.ip.hulu.com:3000', {
+    this.client = io('http://127.0.0.1.ip.hulu.com:3000', {
       perMessageDeflate: false,
       transports: ['websocket']
     });
+    this.socketStream = null;
 
     this.client.on('connect', this.onConnect.bind(this));
     this.client.on('connect_error', this.onConnectError.bind(this));
@@ -48,6 +51,7 @@ class Socket extends EE {
     this.client.on('ev_user_disconnected', this.onUserDisconnected.bind(this));
     this.client.on('ev_receive_file', this.onReceiveRequest.bind(this));
     this.client.on('ev_send_file', this.onAcceptRequest.bind(this));
+    this.client.on('ev_ss_receive_file', this.onReceiveFileStream.bind(this));
   }
 
   disconnect() {
@@ -77,8 +81,33 @@ class Socket extends EE {
       });
   }
 
+  sendFileStream(params) {
+    let writeStream = socketStream.createStream();
+    this.socketStream.emit('ev_ss_send_file', writeStream, params);
+    fs.createReadStream('package.json').pipe(writeStream);
+    writeStream.on('end', () => {
+      console.log('send done!');
+    });
+  }
+
+  onSendFile(data) {
+    this.sendFileStream(data);
+  }
+
+  onReceiveFileStream(readStream, params) {
+    console.log('ev_ss_receive_file: ' + JSON.stringify(params));
+    readStream.pipe(fs.createWriteStream('test.data'));
+    readStream.on('end', () => {
+      console.log('receive done!');
+    });
+  }
+
   onConnect() {
     console.log('connected to server! waiting for server message.');
+
+    this.socketStream = socketStream(this.client);
+    this.socketStream.on('ev_ss_receive_data', this.onReceiveFile.bind(this));
+
     this.emit('connected');
   }
 
