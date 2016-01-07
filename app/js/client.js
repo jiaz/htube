@@ -35,7 +35,7 @@ class Socket extends EE {
   }
 
   connect() {
-    this.client = io('http://127.0.0.1.ip.hulu.com:3000', {
+    this.client = io('http://10.30.16.85.ip.hulu.com:3000', {
       perMessageDeflate: false,
       transports: ['websocket']
     });
@@ -84,7 +84,7 @@ class Socket extends EE {
     this.socketStream.emit('ev_ss_send_file', writeStream, params);
     fs.createReadStream(file).pipe(writeStream);
     writeStream.on('end', () => {
-      console.log('send done!');
+        this.emit('complete_send_file', params.guid);
     });
   }
 
@@ -92,7 +92,7 @@ class Socket extends EE {
     console.log('ev_ss_receive_file: ' + JSON.stringify(params));
     readStream.pipe(fs.createWriteStream(receiveMap.get(params.guid)));
     readStream.on('end', () => {
-      console.log('receive done!');
+        this.emit('complete_receive_file', params.guid);
     });
   }
 
@@ -253,16 +253,15 @@ htubeApp.controller('ListUsersController', ['$scope', 'socket', '$mdDialog', fun
 
   socket.on('receive_request', (data) => {
       console.log('receive_request: ' + JSON.stringify(data)); 
-      var sender = findUser(data.user);
+      var sender = findUser(data.sender);
       var choice = dialog.showMessageBox({type: 'question', buttons: ['No', 'Yes'],
           title: 'Incoming File', message: sender.firstName + ' ' + sender.lastName + ' wants to send you ' + data.file +
           ' (' + (data.fileSize / 1024 >> 0) + 'kb). Accept?'});
       if (choice) {
           let directories = dialog.showOpenDialog({properties: ['openDirectory']});
           if (directories) {
-              socket.acceptRequest(data.user, data.guid);
+              socket.acceptRequest(data.sender, data.guid);
               receiveMap.set(data.guid, path.join(directories[0], data.file));
-              console.log(receiveMap);
           }
       }
   });
@@ -270,6 +269,16 @@ htubeApp.controller('ListUsersController', ['$scope', 'socket', '$mdDialog', fun
   socket.on('start_send_file', (data) => {
       console.log('start sending file: ' + requestMap.get(data.guid)[1]);
       socket.sendFileStream(data, requestMap.get(data.guid)[1]);
+  });
+
+  socket.on('complete_send_file', (guid) => {
+      requestMap.delete(guid);
+      console.log(guid + ' send done! requestMap: ' + JSON.stringify(requestMap));
+  });
+
+  socket.on('complete_receive_file', (guid) => {
+      receiveMap.delete(guid);
+      console.log(guid + ' receive done! receiveMap: ' + JSON.stringify(receiveMap));
   });
 
   $scope.refreshUser();
