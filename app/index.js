@@ -20,7 +20,8 @@ app.on('ready', () => {
     width: 440,
     height: 700,
     resizable: false,
-    'title-bar-style': 'hidden'
+    'title-bar-style': 'hidden',
+    icon: __dirname + '/resources/logo.png'
   });
 
   mainWindow.webContents.openDevTools({detach: true});
