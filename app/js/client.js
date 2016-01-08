@@ -35,7 +35,7 @@ class Socket extends EE {
   }
 
   connect() {
-    this.client = io('http://10.30.16.85.ip.hulu.com:3000', {
+    this.client = io('http://jiaji-salttest-1.server.hulu.com:8099', {
       perMessageDeflate: false,
       transports: ['websocket']
     });
