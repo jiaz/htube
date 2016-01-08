@@ -24,7 +24,7 @@
   <md-content flex>
       <md-list>
         <md-subheader>connected users</md-subheader>
-        <md-list-item ng-repeat="user in users" class="nohand" ng-click="clickPerson(user, $event)">
+        <md-list-item ng-repeat="user in users" class="nohand" ng-click="clickPerson(user, $event)" drag-and-drop>
           <img class="md-avatar md-whiteframe-1dp" ng-src="{{user.avatar}}"/>
 
           <p>{{user.firstName}} {{user.lastName}}</p>

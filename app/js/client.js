@@ -259,22 +259,25 @@ htubeApp.controller('ListUsersController', ['$scope', 'socket', '$mdDialog', fun
     $scope.$apply();
   };
 
+  $scope.sendRequest = function sendRequest(user, file) {
+      let name = path.basename(file);
+      let size = fs.statSync(file).size;
+      let requestGuid = getGuid();
+      socket.sendRequest(user.userGuid, name, size, requestGuid);
+      let t = {
+              name: name,
+              file: file,
+              size: size,
+              user: user,
+      }
+      console.log(JSON.stringify(t));
+      requestMap.set(requestGuid, t);
+  };
+  
   $scope.clickPerson = function clickPerson(user) {
     dialog.showOpenDialog({properties: ['openFile']}, (files) => {
-      if (files) {
-          let file = files[0];
-          let name = path.basename(file);
-          let size = fs.statSync(file).size;
-          let requestGuid = getGuid();
-          socket.sendRequest(user.userGuid, name, size, requestGuid);
-          let t = {
-                  name: name,
-                  file: file,
-                  size: size,
-                  user: user,
-          }
-          console.log(JSON.stringify(t));
-          requestMap.set(requestGuid, t);
+      if (files && files.length > 0) {
+          this.sendRequest(user, files[0]);
       }
     });
   };
@@ -407,7 +410,22 @@ htubeApp.controller('ListUsersController', ['$scope', 'socket', '$mdDialog', fun
   });
 
   $scope.refreshUser();
-}]);
+}])
+.directive('dragAndDrop', function() {
+    return {
+        restrict: 'A',
+        link: function($scope, elem, attr) {
+          elem.bind('drop', function(e) {
+              e.preventDefault();
+              let files = e.dataTransfer.files;
+              if (files && files.length > 0){
+                  $scope.sendRequest($scope.user, files[0].path);
+              }
+              return false;
+          });
+        }
+   };
+});
 
 htubeApp.factory('socket', function () {
   return new Socket();
