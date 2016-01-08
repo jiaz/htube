@@ -277,6 +277,15 @@ htubeApp.controller('ListUsersController', ['$scope', 'socket', '$mdDialog', fun
       }
   };
 
+  $scope.bytesToSize = bytesToSize;
+
+  function bytesToSize(bytes) {
+      var sizes = ['bytes', 'KB', 'MB', 'GB', 'TB'];
+      if (bytes == 0) return '0 Byte';
+      var i = parseInt(Math.floor(Math.log(bytes) / Math.log(1024)));
+      return Math.round(bytes / Math.pow(1024, i), 2) + ' ' + sizes[i];
+  };
+  
   function findUser(userGuid) {
       var user = $scope.users.filter(function (user) { return user.userGuid == userGuid });
       if (user.length > 0) {
@@ -297,7 +306,7 @@ htubeApp.controller('ListUsersController', ['$scope', 'socket', '$mdDialog', fun
       var sender = findUser(data.sender);
       var choice = dialog.showMessageBox({type: 'question', buttons: ['No', 'Yes'],
           title: 'Incoming File', message: sender.firstName + ' ' + sender.lastName + ' wants to send you ' + data.file +
-          ' (' + (data.fileSize / 1024 >> 0) + 'kb). Accept?'});
+          ' (' + bytesToSize(data.fileSize) + '). Accept?'});
       if (choice) {
           let directories = dialog.showOpenDialog({properties: ['openDirectory']});
           if (directories) {
