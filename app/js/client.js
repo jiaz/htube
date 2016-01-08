@@ -239,7 +239,19 @@ htubeApp.controller('ListUsersController', ['$scope', 'socket', '$mdDialog', fun
   };
 
   $scope.onUserUpdated = function onUserUpdated(users) {
-    $scope.users = users;//.filter(function (user) { return user.userGuid != socket.session.userProfile.userGuid });
+    users = users.filter(function (user) { return user.userGuid != socket.session.userProfile.userGuid });
+    users.sort(function(user1, user2){
+        if (user1.firstName == user2.firstName){
+            if (user1.lastName == user2.lastName){
+                return 0;
+            }else{
+                return user1.lastName > user2.lastName ? 1 : -1;
+            }
+        }else{
+            return user1.firstName > user2.firstName ? 1 : -1;
+        }
+    });
+    $scope.users = users;
     $scope.$apply();
   };
 
