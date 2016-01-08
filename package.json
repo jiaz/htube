@@ -14,6 +14,7 @@
     "angular-route": "^1.4.8",
     "eventemitter3": "^1.1.1",
     "lodash": "^3.10.1",
+    "node-notifier": "^4.4.0",
     "socket.io-client": "git+https://github.com/socketio/socket.io-client.git",
     "socket.io-stream": "git+https://github.com/nkzawa/socket.io-stream.git"
   }

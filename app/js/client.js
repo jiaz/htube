@@ -7,6 +7,7 @@ var socketStream = require('socket.io-stream');
 const dialog = remote.dialog;
 const fs = require('fs');
 const path = require('path');
+const notifier = require('node-notifier');
 
 class Socket extends EE {
   constructor() {
@@ -238,7 +239,7 @@ htubeApp.controller('ListUsersController', ['$scope', 'socket', '$mdDialog', fun
   };
 
   $scope.onUserUpdated = function onUserUpdated(users) {
-    $scope.users = users.filter(function (user) { return user.userGuid != socket.session.userProfile.userGuid });
+    $scope.users = users;//.filter(function (user) { return user.userGuid != socket.session.userProfile.userGuid });
     $scope.$apply();
   };
 
@@ -364,7 +365,19 @@ htubeApp.controller('ListUsersController', ['$scope', 'socket', '$mdDialog', fun
 
   socket.on('end_progress', (data) => {
       console.log('end progress: ' + JSON.stringify(data));
-      
+      var t;
+      var message;
+      if (data.isSender) {
+          t = requestMap.get(data.guid);
+          message = t.name + ' has been sent.';
+      }else{
+          t = receiveMap.get(data.guid);
+          message = t.name + ' has been received.';
+      }
+      notifier.notify({
+          'title': 'Transmission Completed',
+          'message': message,
+      });
   });
 
   socket.on('complete_send_file', (guid) => {
