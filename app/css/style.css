@@ -17,12 +17,12 @@ body {
 
 .small-img {
   height: 50px;
-  padding: 10px;
+  margin: 10px;
 }
 
 .large-img {
   height: 80px;
-  padding: 10px;
+  margin: 10px 20px 5px 20px;
 }
 
 .register-form {

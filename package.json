@@ -1,7 +1,7 @@
 {
   "name": "htube",
   "version": "1.0.0",
-  "description": "",
+  "description": "Hulu File Transfer",
   "main": "main.js",
   "scripts": {},
   "author": "",
@@ -10,13 +10,11 @@
     "angular": "^1.4.8",
     "angular-animate": "^1.4.8",
     "angular-aria": "^1.4.8",
+    "angular-messages": "^1.4.8",
     "angular-route": "^1.4.8",
     "eventemitter3": "^1.1.1",
-    "jquery": "^2.1.4",
     "lodash": "^3.10.1",
-    "request": "^2.67.0",
     "socket.io-client": "git+https://github.com/socketio/socket.io-client.git",
-    "socket.io-stream": "git+https://github.com/nkzawa/socket.io-stream.git",
-    "ws": "^1.0.1"
+    "socket.io-stream": "git+https://github.com/nkzawa/socket.io-stream.git"
   }
 }
