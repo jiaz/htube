@@ -203,6 +203,10 @@ htubeApp.controller('LoginController', ['$scope', '$location', 'socket', ($scope
   $scope.$on('$viewContentLoaded', function () {
     var loginView = document.getElementById('login');
 
+    document.ondragover = document.ondrop = function () {
+        return false;
+    };
+
     loginView.addEventListener("dom-ready", function () {
       // fix font
       loginView.insertCSS('body { overflow:hidden; background-color: white ! important; }');
@@ -393,13 +397,11 @@ htubeApp.controller('ListUsersController', ['$scope', 'socket', '$mdDialog', fun
   });
 
   socket.on('complete_send_file', (guid) => {
-      //requestMap.delete(guid);
       console.log(guid + ' send done! requestMap: ');
       console.log(requestMap);
   });
 
   socket.on('complete_receive_file', (guid) => {
-      //receiveMap.delete(guid);
       console.log(guid + ' receive done! receiveMap: ');
       console.log(receiveMap);
   });
