@@ -238,7 +238,7 @@ htubeApp.controller('ListUsersController', ['$scope', 'socket', '$mdDialog', fun
   };
 
   $scope.onUserUpdated = function onUserUpdated(users) {
-    $scope.users = users;
+    $scope.users = users.filter(function (user) { return user.userGuid != socket.session.userProfile.userGuid });
     $scope.$apply();
   };
 
