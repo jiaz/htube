@@ -262,23 +262,18 @@ htubeApp.controller('ListUsersController', ['$scope', 'socket', '$mdDialog', fun
     });
   };
 
-  $scope.closeSend = function closeSend(send) {
-      if (send.percentage == 100){
-          sendQueue.splice(sendQueue.indexOf(send), 1);
-          requestMap.delete(send.guid);
+  $scope.closeProgress = function closeProgress(transmission) {
+      if (transmission.percentage == 100){
+          if (transmission.isSender) {
+              sendQueue.splice(sendQueue.indexOf(transmission), 1);
+              requestMap.delete(transmission.guid);
+          }else{
+              receiveQueue.splice(receiveQueue.indexOf(transmission), 1);
+              receiveMap.delete(transmission.guid);
+          }
           if (sendQueue.length == 0 && receiveQueue.length ==0) {
               progressPanel.style.display = 'none';
           }
-      }
-  };
-
-  $scope.closeReceive = function closeReceive(receive) {
-      if (receive.percentage == 100){
-          receiveQueue.splice(receiveQueue.indexOf(receive), 1);
-          receiveMap.delete(receive.guid);
-      }
-      if (sendQueue.length == 0 && receiveQueue.length ==0) {
-          progressPanel.style.display = 'none';
       }
   };
 
@@ -339,6 +334,7 @@ htubeApp.controller('ListUsersController', ['$scope', 'socket', '$mdDialog', fun
       t.percentage = 0;
       t.currentSize = 0;
       t.transferRate = 0;
+      t.isSender = data.isSender;
       progressPanel.style.display = 'block';
       $scope.$apply();
   });

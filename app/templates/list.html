@@ -7,13 +7,13 @@
   </md-toolbar>
 
     <md-list id="progress-panel" style="display:none;">
-        <md-list-item ng-repeat="send in sendQueue" ng-click="closeSend(send, $event)">
+        <md-list-item ng-repeat="send in sendQueue" ng-click="closeProgress(send)">
             <div flex>
                 Sending {{send.name}} {{send.currentSize / 1024 | number: 0}} out of {{send.size / 1024 | number: 0}} kb to {{send.user.firstName}}
                 <md-progress-linear md-mode="determinate" value="{{send.percentage}}"></md-progress-linear>
             </div>
         </md-list-item>
-        <md-list-item ng-repeat="receive in receiveQueue" ng-click="closeReceive(receive, $event)">
+        <md-list-item ng-repeat="receive in receiveQueue" ng-click="closeProgress(receive)">
             <div flex>
                 Receiving {{receive.name}} {{receive.currentSize / 1024 | number: 0}} out of {{receive.size / 1024 | number: 0}} kb from {{receive.user.firstName}}</p>
                 <md-progress-linear md-mode="determinate" value="{{receive.percentage}}"></md-progress-linear>
