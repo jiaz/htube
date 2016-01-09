@@ -3,3 +3,4 @@ node_modules/
 *.iml
 .idea/
 HTube-darwin-x64/
+HTube-linux-x64/

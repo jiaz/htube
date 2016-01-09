@@ -4,12 +4,16 @@ const electron = require('electron');
 const app = electron.app;
 const BrowserWindow = electron.BrowserWindow;
 
+var server = 'localhost.hulu.com:3000';
+
 electron.crashReporter.start({
   companyName: 'com.hulu',
-  submitURL: 'localhost.hulu.com'
+  submitURL: server
 });
 
 let mainWindow = null;
+
+app.server = server;
 
 app.on('window-all-closed', () => {
   app.quit();
@@ -40,3 +44,5 @@ app.on('ready', () => {
     mainWindow = null;
   });
 });
+
+require('./p2psocket');

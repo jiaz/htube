@@ -25,9 +25,9 @@
       <md-list>
         <md-subheader>connected users</md-subheader>
         <md-list-item ng-repeat="user in users" class="nohand" ng-click="clickPerson(user, $event)" drag-and-drop>
-          <img class="md-avatar md-whiteframe-1dp" ng-src="{{user.avatar}}"/>
+          <img class="md-avatar md-whiteframe-1dp" ng-src="{{user.profile.avatar}}"/>
 
-          <p>{{user.firstName}} {{user.lastName}}</p>
+          <p>{{user.profile.firstName}} {{user.profile.lastName}}</p>
         </md-list-item>
       </md-list>
   </md-content>
