@@ -28,7 +28,7 @@ app.on('ready', () => {
     icon: __dirname + '/resources/logo.png'
   });
 
-  mainWindow.webContents.openDevTools({detach: true});
+  // mainWindow.webContents.openDevTools({detach: true});
 
   if (process.env['NO_CACHE'] == '1') {
     mainWindow.webContents.session.clearStorageData({
