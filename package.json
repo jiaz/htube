@@ -12,6 +12,7 @@
     "angular-aria": "^1.4.8",
     "angular-messages": "^1.4.8",
     "angular-route": "^1.4.8",
+    "debug": "^2.2.0",
     "eventemitter3": "^1.1.1",
     "lodash": "^3.10.1",
     "node-notifier": "^4.4.0",

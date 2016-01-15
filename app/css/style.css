@@ -21,8 +21,9 @@ body {
 }
 
 .large-img {
-  height: 80px;
+  height: 60px;
   margin: 10px 20px 5px 20px;
+  border: 2px solid #F0F0F0;
 }
 
 .register-form {
@@ -47,6 +48,6 @@ body {
 }
 
 #info-panel .name-title {
-  color: white;
+  color: #F0F0F0;
   cursor: default;
 }

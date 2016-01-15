@@ -4,7 +4,7 @@ const electron = require('electron');
 const app = electron.app;
 const BrowserWindow = electron.BrowserWindow;
 
-var server = 'localhost.hulu.com:3000';
+var server = 'jiaji-salttest-1.server.hulu.com:8500';
 
 electron.crashReporter.start({
   companyName: 'com.hulu',
