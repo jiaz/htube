@@ -9,13 +9,13 @@
     <md-list id="progress-panel" style="display:none;">
         <md-list-item ng-repeat="send in sendQueue" ng-click="closeSendProgress(send)">
             <div flex>
-                Sending {{send.name}} {{bytesToSize(send.currentSize)}} out of {{bytesToSize(send.size)}} ({{bytesToSize(send.transferRate)}}/s) to {{send.user.firstName}} {{send.percentage == 100 ? 'completed' : ''}}
+                Sending {{send.name}} {{bytesToSize(send.currentSize)}} out of {{bytesToSize(send.size)}} ({{bytesToSize(send.transferRate)}}/s) to {{send.user.profile.firstName}} {{send.percentage == 100 ? 'completed' : ''}}
                 <md-progress-linear md-mode="determinate" value="{{send.percentage}}"></md-progress-linear>
             </div>
         </md-list-item>
         <md-list-item ng-repeat="receive in receiveQueue" ng-click="closeReceiveProgress(receive)">
             <div flex>
-                Receiving {{receive.name}} {{bytesToSize(receive.currentSize)}} out of {{bytesToSize(receive.size)}} ({{bytesToSize(receive.transferRate)}}/s) from {{receive.user.firstName}} {{receive.percentage == 100 ? 'completed' : ''}}
+                Receiving {{receive.name}} {{bytesToSize(receive.currentSize)}} out of {{bytesToSize(receive.size)}} ({{bytesToSize(receive.transferRate)}}/s) from {{receive.user.profile.firstName}} {{receive.percentage == 100 ? 'completed' : ''}}
                 <md-progress-linear md-mode="determinate" value="{{receive.percentage}}"></md-progress-linear>
             </div>
         </md-list-item>
